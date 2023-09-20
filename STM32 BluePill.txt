@@ -1,0 +1,80 @@
+// HC-SR04 mesafe sensörü için tanımlamalar
+const int trigPin = 2; //ultrasonik ses sinyali gönderilir
+const int echoPin = 3; //geri gelen sinyal algılanır ve mesafe verisi işlenir
+
+// Motor için tanımlamalar
+const int motorPin1 = 4; //motorun pinleri tanımlanır
+const int motorPin2 = 5;
+
+// LED'ler için tanımlamalar
+const int redLedPin = 6; //ledlerin pinleri tayin edilir
+const int yellowLedPin = 7;
+const int greenLedPin = 8;
+
+void setup() {
+  // Pin modlarını ayarla
+  pinMode(trigPin, OUTPUT);
+  pinMode(echoPin, INPUT);
+  
+  pinMode(motorPin1, OUTPUT);
+  pinMode(motorPin2, OUTPUT);
+  
+  pinMode(redLedPin, OUTPUT);
+  pinMode(yellowLedPin, OUTPUT);
+  pinMode(greenLedPin, OUTPUT);
+  
+  // Seri haberleşmeyi başlat
+  Serial.begin(9600);
+}
+
+void loop() {
+  // Mesafe ölçümü yap
+  long duration, distance;
+  
+  digitalWrite(trigPin, LOW);
+  delayMicroseconds(2);
+  
+  digitalWrite(trigPin, HIGH);
+  delayMicroseconds(10);
+  
+  digitalWrite(trigPin, LOW);
+  
+  duration = pulseIn(echoPin, HIGH);
+  
+  distance = duration * 0.034 / 2;
+  
+  // Mesafeyi kontrol et ve aksiyon al
+  if (distance >= 350) {
+    // Motoru saat yönünde döndür ve yeşil LED'i yak
+    digitalWrite(motorPin1, HIGH);
+    digitalWrite(motorPin2, LOW);
+    
+    digitalWrite(redLedPin, LOW);
+    digitalWrite(yellowLedPin, LOW);
+    digitalWrite(greenLedPin, HIGH);
+    
+    Serial.println("Mesafe: " + String(distance) + " cm. Motor saat yönünde dönüyor.");
+  } else if (distance <= 250) {
+    // Motoru saat yönünün tersine döndür ve kırmızı LED'i yak
+    digitalWrite(motorPin1, LOW);
+    digitalWrite(motorPin2, HIGH);
+    
+    digitalWrite(redLedPin, HIGH);
+    digitalWrite(yellowLedPin, LOW);
+    digitalWrite(greenLedPin, LOW);
+    
+    Serial.println("Mesafe: " + String(distance) + " cm. Motor saat yönünün tersine dönüyor.");
+  } else {
+    // Motoru durdur ve sarı LED'i yak
+    digitalWrite(motorPin1, LOW);
+    digitalWrite(motorPin2, LOW);
+    
+    digitalWrite(redLedPin, LOW);
+    digitalWrite(yellowLedPin, HIGH);
+    digitalWrite(greenLedPin, LOW);
+    
+    Serial.println("Mesafe: " + String(distance) + " cm. Motor durdu.");
+  }
+  
+  delay(1000); // Ölçüm aralığını ayarla
+}
